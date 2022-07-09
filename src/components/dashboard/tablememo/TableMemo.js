@@ -1,12 +1,20 @@
 import Column from "./columns/Column";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { Modal, Button } from "react-bootstrap";
+import Formadd from "./columns/formAddCard";
+
 
 const TableMemo = (props) => {
   const [show, setShow] = useState(false);
+  const [numColumnAddCard, setnumColumnAddCard] = useState(false);
+  const handleClickCloseModal = () => {
+      setShow(false);
+  }
 
-  const handleClickCloseModal = () => setShow(false);
-  const handleClickShowModal = () => setShow(true);
+  const handleClickShowModal = (numColumn) => {
+      setnumColumnAddCard(numColumn);
+      setShow(true);
+  }
   return (
     <section>
       <h2>{props.term}</h2>
@@ -16,7 +24,10 @@ const TableMemo = (props) => {
             key={column.id}
             column={column}
             index_column={index_column}
-            onClickShowModal={handleClickShowModal} />)}
+            onClickShowModal={handleClickShowModal}
+            editMode={props.editMode}
+            />
+            )}
       </section>
       {/* Modal pour créer une carte */}
       <Modal show={show} onHide={handleClickCloseModal}>
@@ -24,17 +35,13 @@ const TableMemo = (props) => {
           <Modal.Title>Ajout d'une carte</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-
-
+            <div className="modal-body">
+                {<Formadd
+                    onClickCloseModal={handleClickCloseModal}
+                    numColumn={numColumnAddCard}
+                />}
+            </div>
         </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleClickCloseModal}>
-            Close
-          </Button>
-          <Button variant="primary" onClick={handleClickCloseModal}>
-            Save Changes
-          </Button>
-        </Modal.Footer>
       </Modal>
     </section>
   );
