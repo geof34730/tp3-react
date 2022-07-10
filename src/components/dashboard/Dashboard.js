@@ -6,7 +6,7 @@ import {useState, createContext} from "react";
 import {Modal} from "react-bootstrap";
 import Formadd from "./tablememo/columns/formCard";
 import Formterm from "./tablememo/columns/formTerm";
-import term from "./terms/Term";
+
 
 export const MemoContext = createContext();
 
@@ -15,7 +15,7 @@ const Dashboard = () => {
     const [is_logged, setIsLogged] = useState(false);
     const [terms, setTerms] = useState([]);
     const [columns, setColumns] = useState([]);
-    const [allTerms, setallTerms] = useState([]);
+    //const [allTerms, setallTerms] = useState([]);
     const [allContent, setAllContent] = useState([]);
     const [current_term, setCurrentTerm] = useState("");
     const [editMode, setEditMode] = useState(false);
