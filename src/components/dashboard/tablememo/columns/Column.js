@@ -11,7 +11,7 @@ const Column = (props) => {
           {props.editMode && (
               <div>
                   <button
-                      onClick={ () => {onClickShowModalAddCard(props.index_column);}}
+                      onClick={ (e) => {onClickShowModalAddCard(e,props.index_column);}}
                       className="btn btn-success ms-1 me-1"
                   >+</button>
                   <button type="button"  className="btn btn-outline-success" >

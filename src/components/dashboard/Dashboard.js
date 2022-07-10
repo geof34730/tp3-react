@@ -4,8 +4,8 @@ import FormLogin from './formlogin/FormLogin';
 import MemopusData from "../../services/MemopusData";
 import {useState, createContext} from "react";
 import {Modal} from "react-bootstrap";
-import Formadd from "./tablememo/columns/formAddCard";
-
+import Formadd from "./tablememo/columns/formCard";
+import Formterm from "./tablememo/columns/formTerm";
 
 export const MemoContext = createContext();
 
@@ -15,13 +15,51 @@ const Dashboard = () => {
     const [terms, setTerms] = useState([]);
     const [columns, setColumns] = useState([]);
     const [current_term, setCurrentTerm] = useState("");
+
     const [editMode, setEditMode] = useState(false);
+
     const [showModalCard, setShowModalCard] = useState(false);
     const [showModalTerm, setShowModalTerm] = useState(false);
-    const [cardEdit, setCardEdit] = useState(false);
+
+    const [cardEdit, setCardEdit] = useState(null);
+    const [termEdit, setTermEdit] = useState(null);
+
     const [numColumnAddCard, setNumColumnAddCard] = useState(false);
 
     class handleContext {
+        /**************** BEGIN MANAGE TERMS MODAL CATEGORIE 1  ********************/
+
+        static getTermEdit(){
+            return termEdit;
+        }
+
+
+
+        static handleClickAddTerm = (e,callBack) => {
+            e.preventDefault();
+            console.log('handleClickAddTerme');
+           // setTermEdit(null)
+           // setShowModalTerm(true)
+        }
+
+
+        static handleClickUpdateTerm = (e, indexTerm,callBack) => {
+            e.preventDefault();
+            const terms_copy = [...terms];
+            terms_copy[indexTerm].name=e.target.termname.value;
+            setTerms(terms_copy);
+        }
+
+        static handleClickEditTerm = (indexTerm) => {
+            console.log('handleClickEditTerme');
+            const terms_copy = [...terms];
+            let contentEdit=terms_copy[indexTerm];
+            contentEdit.indexTerm=indexTerm;
+            setTermEdit(terms_copy[indexTerm])
+            console.log(terms_copy[indexTerm]);
+            setShowModalTerm(true)
+        }
+
         static handleClickDeleteTerm = (indexTerm) => {
             console.log(`Dans handleClickDeleteTerm`, indexTerm);
             if (window.confirm("êtes-vous sûr de vouloir supprimer cette rubrique ?")) {
@@ -31,13 +69,7 @@ const Dashboard = () => {
             }
         }
 
-        static handleClickEditTerm = (indexTerm) => {
-            console.log('handleClickEditTerme');
-        }
 
-        static handleClickAddTerm = (indexTerm) => {
-            console.log('handleClickAddTerme');
-        }
 
         static handleClickTerm = async (term) => {
             console.log(`dans handleClickTerm`, term.id);
@@ -51,7 +83,43 @@ const Dashboard = () => {
             }
         }
 
-       static handleClickAddCard = (e, indexColumn,callBack) => {
+        static handleClickShowModalTerm = (e,indexTerm=null) => {
+           // setNumColumnAddCard(numColumn);
+            console.log('handleClickAddTerme');
+            setTermEdit(null)
+            setShowModalTerm(true)
+
+        }
+        static handleClickCloseModalTerm = () => {
+            setShowModalTerm(false);
+        }
+
+
+/*
+        static handleClickShowModalAddTerm(numColumn){
+            setCardEdit(null)
+            handleContext.handleClickShowModalTerm(numColumn)
+        }
+*/
+        static handleClickShowModalTerm = () => {
+            setTermEdit(null)
+            setShowModalTerm(true);
+        }
+        /**************** END MANAGE TERMS MODAL  ********************/
+
+
+        /**************** BEGIN MANAGE TERMS MODAL CATEGORIE 2 (Entete Column)  ********************/
+
+
+
+        /**************** END MANAGE TERMS MODAL CATEGORIE 2 (Entete Column)  ********************/
+
+        /**************** BEGIN MANAGE CARD MODAL  ********************/
+        static getCardEdit(){
+            return cardEdit;
+        }
+
+        static handleClickAddCard = (e, indexColumn,callBack) => {
             console.log('handleClickAddCard',indexColumn);
             e.preventDefault();
             const columns_copy = [...columns];
@@ -64,7 +132,14 @@ const Dashboard = () => {
             setColumns(columns_copy);
             callBack()
         }
-
+        static handleClickDeleteCard = (index_column,index_card) => {
+            console.log(`Dans handleClickDeleteCard`, index_card);
+            if (window.confirm("êtes-vous sûr de vouloir supprimer cette carte ?")) {
+                const columns_copy = [...columns];
+                columns_copy[index_column].cartes.splice(index_card, 1)
+                setColumns(columns_copy);
+            }
+        }
         static handleClickUpdateCard = (e, indexColumn,indexCard,callBack) => {
             e.preventDefault();
             console.log('handleClickUpdateCard',indexColumn);
@@ -76,7 +151,6 @@ const Dashboard = () => {
             setColumns(columns_copy);
             callBack()
         }
-
         static handleClickEditCard = (index_column,index_card) => {
             console.log('handleClickEditCard');
             const columns_copy = [...columns];
@@ -86,28 +160,6 @@ const Dashboard = () => {
             setCardEdit(columns_copy[index_column].cartes[index_card])
             setShowModalCard(true)
         }
-
-        static getCardEdit(){
-            return cardEdit;
-        }
-
-        static handleClickDeleteCard = (index_column,index_card) => {
-            console.log(`Dans handleClickDeleteCard`, index_card);
-            if (window.confirm("êtes-vous sûr de vouloir supprimer cette carte ?")) {
-                const columns_copy = [...columns];
-                columns_copy[index_column].cartes.splice(index_card, 1)
-                setColumns(columns_copy);
-            }
-        }
-
-        static  handleClickShowModalTerm = (numColumn) => {
-            setNumColumnAddCard(numColumn);
-            setShowModalTerm(true);
-        }
-        static handleClickCloseModalTerm = () => {
-            setShowModalTerm(false);
-        }
-
         static handleClickShowModalAddCard(numColumn){
             setCardEdit(null)
             handleContext.handleClickShowModalCard(numColumn)
@@ -120,6 +172,7 @@ const Dashboard = () => {
         static handleClickCloseModalCard = () => {
             setShowModalCard(false);
         }
+        /**************** END CARD MODAL  ********************/
 
     }
 
@@ -161,7 +214,7 @@ const Dashboard = () => {
                             />)}
                         </MemoContext.Provider>
                         {editMode && (
-                        <button type="button" className="btn btn-success">+</button>
+                        <button type="button" className="btn btn-success" onClick={handleContext.handleClickShowModalTerm}>+</button>
                         )}
                         {editMode ? (
                             <button type="button"  className="btn btn-warning" onClick={handleClickChangeMode}>
@@ -192,11 +245,18 @@ const Dashboard = () => {
 
                     <Modal show={showModalTerm}  onHide={handleContext.handleClickCloseModalTerm}>
                         <Modal.Header closeButton>
-                            <Modal.Title>Ajout/Modification d'un Terme</Modal.Title>
+                            {
+                                (termEdit == null ?
+                                        <Modal.Title>Ajout d'une rubrique</Modal.Title>
+                                        :
+                                        <Modal.Title>Modification d'une rubrique</Modal.Title>
+                                )}
                         </Modal.Header>
                         <Modal.Body>
                             <div className="modal-body">
-                               Ajout terme
+                                {<Formterm
+
+                                />}
                             </div>
                         </Modal.Body>
                     </Modal>

@@ -1,7 +1,7 @@
 import Column from "./columns/Column";
 import { useState, useContext } from "react";
 import { Modal, Button } from "react-bootstrap";
-import Formadd from "./columns/formAddCard";
+import Formadd from "./columns/formCard";
 
 import {MemoContext} from "../Dashboard";
 
