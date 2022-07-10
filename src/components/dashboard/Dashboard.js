@@ -3,8 +3,11 @@ import Term from "./terms/Term";
 import FormLogin from './formlogin/FormLogin';
 import MemopusData from "../../services/MemopusData";
 import {useState, createContext} from "react";
+import {Modal} from "react-bootstrap";
+import Formadd from "./tablememo/columns/formAddCard";
 
-export const CardContext = createContext();
+
+export const MemoContext = createContext();
 
 const Dashboard = () => {
     // utilisation du hook d'état
@@ -13,67 +16,115 @@ const Dashboard = () => {
     const [columns, setColumns] = useState([]);
     const [current_term, setCurrentTerm] = useState("");
     const [editMode, setEditMode] = useState(false);
+    const [showModalCard, setShowModalCard] = useState(false);
+    const [showModalTerm, setShowModalTerm] = useState(false);
+    const [cardEdit, setCardEdit] = useState(false);
+    const [numColumnAddCard, setNumColumnAddCard] = useState(false);
 
-    const handleClickDeleteTerm = (indexTerm) => {
-        console.log(`Dans handleClickDeleteTerm`, indexTerm);
-        const terms_copy = [...terms];
-        terms_copy.splice(indexTerm, 1);
-        setTerms(terms_copy);
-    }
-    const handleClickEditTerm = (indexTerm) => {
-        console.log('handleClickEditTerme');
-    }
-    const handleClickAddTerm = (indexTerm) => {
-        console.log('handleClickAddTerme');
-    }
-    const handleClickChangeMode = () =>{
-        setEditMode(!editMode)
-    }
-    class handleCardContext {
-        /*
-       static handleClickDeleteCard = (index_column, index_card) => {
-           console.log(`Dans handleClickDeleteCard`);
-
-           console.log(`Dans handleClickDeleteCard`, index_column, index_card);
-           const columns_copy = [...columns];
-           console.log(`columns_copy`, columns_copy);
-           columns_copy[index_column].cartes.splice(index_card, 1);
-           setColumns(columns_copy);
-
-
+    class handleContext {
+        static handleClickDeleteTerm = (indexTerm) => {
+            console.log(`Dans handleClickDeleteTerm`, indexTerm);
+            if (window.confirm("êtes-vous sûr de vouloir supprimer cette rubrique ?")) {
+                const terms_copy = [...terms];
+                terms_copy.splice(indexTerm, 1);
+                setTerms(terms_copy);
+            }
         }
 
-         */
+        static handleClickEditTerm = (indexTerm) => {
+            console.log('handleClickEditTerme');
+        }
 
-        static handleClickAddCard = (e, indexColumn,callBack) => {
-            let questionValue = e.target.question.value;
-            let reponseValue = e.target.reponse.value;
-            let explicationValue = e.target.explication.value;
+        static handleClickAddTerm = (indexTerm) => {
+            console.log('handleClickAddTerme');
+        }
+
+        static handleClickTerm = async (term) => {
+            console.log(`dans handleClickTerm`, term.id);
+            try {
+                const columns_response = await MemopusData.getCards(term.id);
+                console.log(`columns_response `, columns_response);
+                setCurrentTerm(term.name);
+                setColumns(columns_response);
+            } catch (error) {
+                console.error("Erreur attrapée dans handleSubmitLogin", error);
+            }
+        }
+
+       static handleClickAddCard = (e, indexColumn,callBack) => {
+            console.log('handleClickAddCard',indexColumn);
+            e.preventDefault();
             const columns_copy = [...columns];
             columns_copy[indexColumn].cartes.push({
-                colonne: '18',
-                explication: explicationValue,
-                id: (Math.random() * 100000),
-                question: questionValue,
-                reponse: reponseValue
+                id: Math.floor(Math.random() * 100000),
+                question: e.target.question.value,
+                reponse:  e.target.reponse.value,
+                explication: e.target.explication.value,
             });
             setColumns(columns_copy);
-            e.preventDefault();
             callBack()
         }
 
-        static handleClickDeleteCard = () => {
-            console.log(`Dans handleClickDeleteCard`);
+        static handleClickUpdateCard = (e, indexColumn,indexCard,callBack) => {
+            e.preventDefault();
+            console.log('handleClickUpdateCard',indexColumn);
+            const columns_copy = [...columns];
+            let myCarteUpdate=columns_copy[indexColumn].cartes[indexCard]
+            myCarteUpdate.question=e.target.question.value;
+            myCarteUpdate.reponse=e.target.reponse.value;
+            myCarteUpdate.explication=e.target.explication.value;
+            setColumns(columns_copy);
+            callBack()
         }
 
-
-
-
-
-        static handleClickEditCard = (indexTerm) => {
+        static handleClickEditCard = (index_column,index_card) => {
             console.log('handleClickEditCard');
+            const columns_copy = [...columns];
+            let contentEdit=columns_copy[index_column].cartes[index_card];
+            contentEdit.index_card=index_card;
+            contentEdit.index_column=index_column
+            setCardEdit(columns_copy[index_column].cartes[index_card])
+            setShowModalCard(true)
         }
 
+        static getCardEdit(){
+            return cardEdit;
+        }
+
+        static handleClickDeleteCard = (index_column,index_card) => {
+            console.log(`Dans handleClickDeleteCard`, index_card);
+            if (window.confirm("êtes-vous sûr de vouloir supprimer cette carte ?")) {
+                const columns_copy = [...columns];
+                columns_copy[index_column].cartes.splice(index_card, 1)
+                setColumns(columns_copy);
+            }
+        }
+
+        static  handleClickShowModalTerm = (numColumn) => {
+            setNumColumnAddCard(numColumn);
+            setShowModalTerm(true);
+        }
+        static handleClickCloseModalTerm = () => {
+            setShowModalTerm(false);
+        }
+
+        static handleClickShowModalAddCard(numColumn){
+            setCardEdit(null)
+            handleContext.handleClickShowModalCard(numColumn)
+        }
+        static handleClickShowModalCard = (numColumn) => {
+            setNumColumnAddCard(numColumn);
+            console.log('handleClickShowModalCard',numColumn)
+            setShowModalCard(true);
+        }
+        static handleClickCloseModalCard = () => {
+            setShowModalCard(false);
+        }
+
+    }
+
+    const handleClickChangeMode = () => {
+        setEditMode(!editMode)
     }
 
     const handleSubmitLogin = async (e) => {
@@ -95,18 +146,6 @@ const Dashboard = () => {
         }
     }
 
-    const handleClickTerm = async (term) => {
-        console.log(`dans handleClickTerm`, term.id);
-        try {
-            const columns_response = await MemopusData.getCards(term.id);
-            console.log(`columns_response `, columns_response);
-            setCurrentTerm(term.name);
-            setColumns(columns_response);
-        } catch (error) {
-            console.error("Erreur attrapée dans handleSubmitLogin", error);
-        }
-    }
-
     return (
         <>
             {!is_logged ? (
@@ -114,15 +153,13 @@ const Dashboard = () => {
             ) : (
                 <>
                     <nav className="d-flex justify-content-center flex-wrap gap-2">
-                        {terms.map((term, indexTerm) => <Term key={term.id}
-                                                              onClickTerm={handleClickTerm}
-                                                              onClickDeleteTerm={handleClickDeleteTerm}
-                                                              onClickEditTerm={handleClickEditTerm}
-                                                              onClickAddTerm={handleClickAddTerm}
-                                                              term={term}
-                                                              indexTerm={indexTerm}
-                                                              editMode={editMode}
-                        />)}
+                        <MemoContext.Provider value={handleContext}>
+                            {terms.map((term, indexTerm) => <Term key={term.id}
+                                                                  term={term}
+                                                                  indexTerm={indexTerm}
+                                                                  editMode={editMode}
+                            />)}
+                        </MemoContext.Provider>
                         {editMode && (
                         <button type="button" className="btn btn-success">+</button>
                         )}
@@ -146,13 +183,42 @@ const Dashboard = () => {
                             </button>
                         )}
                     </nav>
-                    <CardContext.Provider value={handleCardContext}>
+                    <MemoContext.Provider value={handleContext}>
                         <TableMemo
                             term={current_term}
                             columns={columns}
                             editMode={editMode}
                         />
-                    </CardContext.Provider>
+
+                    <Modal show={showModalTerm}  onHide={handleContext.handleClickCloseModalTerm}>
+                        <Modal.Header closeButton>
+                            <Modal.Title>Ajout/Modification d'un Terme</Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>
+                            <div className="modal-body">
+                               Ajout terme
+                            </div>
+                        </Modal.Body>
+                    </Modal>
+
+                    <Modal show={showModalCard} onHide={handleContext.handleClickCloseModalCard}>
+                        <Modal.Header closeButton>
+                                {
+                                (cardEdit == null ?
+                                    <Modal.Title>Ajout d'une carte</Modal.Title>
+                                    :
+                                    <Modal.Title>Modification d'une carte</Modal.Title>
+                                )}
+                        </Modal.Header>
+                        <Modal.Body>
+                                <div className="modal-body">
+                                    {<Formadd
+                                        numColumn={numColumnAddCard}
+                                    />}
+                                </div>
+                            </Modal.Body>
+                        </Modal>
+                    </MemoContext.Provider>
                 </>
             )}
         </>

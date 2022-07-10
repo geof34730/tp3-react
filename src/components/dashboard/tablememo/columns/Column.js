@@ -1,13 +1,17 @@
+import { useState, useContext } from "react";
+import {MemoContext} from "../../Dashboard";
 import Card from "./cards/Card";
+
 const Column = (props) => {
+  const onClickShowModalAddCard = useContext(MemoContext).handleClickShowModalAddCard;
   return (
     <section className="col">
       <div className="d-flex mb-2 mt-2 flex-wrap ">
-        <h3 class="fs-4">{props.column.name}</h3>
+        <h3 className="fs-4">{props.column.name}</h3>
           {props.editMode && (
               <div>
                   <button
-                      onClick={ () => {props.onClickShowModal(props.index_column)}}
+                      onClick={ () => {onClickShowModalAddCard(props.index_column);}}
                       className="btn btn-success ms-1 me-1"
                   >+</button>
                   <button type="button"  className="btn btn-outline-success" >
