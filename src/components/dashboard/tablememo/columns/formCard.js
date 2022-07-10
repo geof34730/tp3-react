@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useContext } from "react";
 import {MemoContext} from "../../Dashboard";
 
 const Formadd = (props) => {
@@ -7,7 +7,7 @@ const Formadd = (props) => {
     const onClickCloseModalCard = useContext(MemoContext).handleClickCloseModalCard;
     const cardEdit=useContext(MemoContext).getCardEdit();
 
-    console.log(cardEdit);
+    console.log(props);
 
 
     return (

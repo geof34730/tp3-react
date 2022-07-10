@@ -81,6 +81,7 @@ export default class MemopusData {
       })
       .then((data) => {
         console.log("data reçues dans getTerms :", data);
+
         return data;
       })
       .catch((error) => {
@@ -117,11 +118,11 @@ export default class MemopusData {
         else throw new Error("Problème de réponse du serveur :  " + response.status);
       })
       .then((data) => {
-        console.log("Data dans getCards : ", data);
+       // console.log("Data dans getCards : ", data);
         return data;
       })
       .catch((error) => {
-        console.log("Erreur attrapée dans getCards", error);
+       // console.log("Erreur attrapée dans getCards", error);
       });
   };
 }

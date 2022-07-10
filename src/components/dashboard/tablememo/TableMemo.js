@@ -1,13 +1,5 @@
 import Column from "./columns/Column";
-import { useState, useContext } from "react";
-import { Modal, Button } from "react-bootstrap";
-import Formadd from "./columns/formCard";
-
-import {MemoContext} from "../Dashboard";
-
 const TableMemo = (props) => {
-
-
   return (
     <section>
       <h2>{props.term}</h2>
@@ -21,9 +13,6 @@ const TableMemo = (props) => {
             />
             )}
       </section>
-
-
-
     </section>
   );
 }
