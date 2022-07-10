@@ -17,97 +17,51 @@ const Dashboard = () => {
     const [columns, setColumns] = useState([]);
     const [allTerms, setallTerms] = useState([]);
     const [allContent, setAllContent] = useState([]);
-
     const [current_term, setCurrentTerm] = useState("");
-
     const [editMode, setEditMode] = useState(false);
-
     const [showModalCard, setShowModalCard] = useState(false);
     const [showModalTerm, setShowModalTerm] = useState(false);
-
     const [cardEdit, setCardEdit] = useState(null);
     const [termEdit, setTermEdit] = useState(null);
-
     const [numColumnAddCard, setNumColumnAddCard] = useState(false);
-
-
-
-
-
-
-
-    //const loadAllColumn = async () => {
-
-        /*
-         console.log('**********loadAllColumn***********');
-         const allContent_copy = [...allContent];
-         let contents;
-         terms.map(async (thisTerm, indexTerm) => {
-             contents = await MemopusData.getCards(thisTerm.id);
-
-             allContent_copy[indexTerm]=contents;
-             allContent_copy[indexTerm].id=thisTerm.id;
-         });
-         await console.log('allContent_copy',allContent_copy);
-         await setAllContent(allContent_copy);
-         */
-
-    //}
-
-
-
-
-
-
 
     class handleContext {
         /**************** BEGIN MANAGE TERMS MODAL CATEGORIE 1  ********************/
-
         static getTermEdit(){
             return termEdit;
         }
-
-
-
         static handleClickTerm = async (term) => {
-
             const allContent_copy = [...allContent];
-            console.log(allContent_copy)
-
-
-            console.log(`dans handleClickTerm`, term.id);
-            try {
-                const columns_response = await MemopusData.getCards(term.id);
-                console.log(`columns_response `, columns_response);
+            let isLoadANdSave=allContent_copy.find(element => element.id === term.id);
+            if(isLoadANdSave!=null){
                 setCurrentTerm(term.name);
-                setColumns(columns_response);
-            } catch (error) {
-                console.error("Erreur attrapée dans handleSubmitLogin", error);
+                setColumns(isLoadANdSave);
             }
-
+            else{
+               try {
+                    const columns_response = await MemopusData.getCards(term.id);
+                    setCurrentTerm(term.name);
+                    setColumns(columns_response);
+                    columns_response.id=term.id;
+                    allContent_copy.push(columns_response);
+                    setAllContent(allContent_copy);
+                } catch (error) {
+                    console.error("Erreur attrapée dans handleSubmitLogin", error);
+                }
+            }
         }
-
-
-
-
-
         static handleClickAddTerm = (e,callBack) => {
             e.preventDefault();
             console.log('handleClickAddTerme');
             const terms_copy = [...terms];
-
-          //  console.log(terms_copy);
             terms_copy.push({
                 id: Math.floor(Math.random() * 100000),
                 pid: 0,
                 name:  e.target.termname.value,
             });
-          //  console.log(terms_copy);
             setTerms(terms_copy);
             setShowModalTerm(false);
         }
-
-
         static handleClickUpdateTerm = (e, indexTerm,callBack) => {
             e.preventDefault();
             const terms_copy = [...terms];
@@ -115,7 +69,6 @@ const Dashboard = () => {
             setTerms(terms_copy);
             setShowModalTerm(false)
         }
-
         static handleClickEditTerm = (indexTerm) => {
             console.log('handleClickEditTerme');
             const terms_copy = [...terms];
@@ -125,7 +78,6 @@ const Dashboard = () => {
          //   console.log(terms_copy[indexTerm]);
             setShowModalTerm(true)
         }
-
         static handleClickDeleteTerm = (indexTerm) => {
             console.log(`Dans handleClickDeleteTerm`, indexTerm);
             if (window.confirm("êtes-vous sûr de vouloir supprimer cette rubrique ?")) {
@@ -134,9 +86,6 @@ const Dashboard = () => {
                 setTerms(terms_copy);
             }
         }
-
-
-
         static handleClickShowModalTerm = (e,indexTerm=null) => {
            // setNumColumnAddCard(numColumn);
             console.log('handleClickAddTerme');
@@ -152,30 +101,19 @@ const Dashboard = () => {
         }
         /**************** END MANAGE TERMS MODAL  ********************/
 
-
-
-
         /**************** BEGIN MANAGE CARD MODAL  ********************/
         static getCardEdit(){
             return cardEdit;
         }
-
         static handleClickAddCard = (e, indexColumn,callBack) => {
-        //    console.log('handleClickAddCard',indexColumn);
             e.preventDefault();
             const columns_copy = [...columns];
-        //    console.log(indexColumn)
-        //    console.log(columns_copy)
-
-       //     console.log(columns_copy[indexColumn])
-
             columns_copy[indexColumn].cartes.push({
                 id: Math.floor(Math.random() * 100000),
                 question: e.target.question.value,
                 reponse:  e.target.reponse.value,
                 explication: e.target.explication.value,
             });
-
             setColumns(columns_copy);
             callBack()
         }
@@ -183,7 +121,7 @@ const Dashboard = () => {
             console.log(`Dans handleClickDeleteCard`, index_card);
             if (window.confirm("êtes-vous sûr de vouloir supprimer cette carte ?")) {
                 const columns_copy = [...columns];
-         //       columns_copy[index_column].cartes.splice(index_card, 1)
+                columns_copy[index_column].cartes.splice(index_card, 1)
                 setColumns(columns_copy);
             }
         }
@@ -223,20 +161,18 @@ const Dashboard = () => {
             }
             setShowModalCard(false);
         }
-
         static handleClickMoveCard(indexCard,cardColumnSelf,cardColumnTarget){
-            console.log('handleClickMoveCardd');
-            console.log('indexCard',indexCard);
-            console.log('cardColumnSelf',cardColumnSelf);
-            console.log('cardColumnTarget',cardColumnTarget);
+            const columns_copy = [...columns];
+            let cardsCopy=columns_copy[cardColumnSelf].cartes[indexCard];
+            columns_copy[cardColumnSelf].cartes.splice(indexCard, 1)
+            columns_copy[cardColumnTarget].cartes.push(cardsCopy);
+            setColumns(columns_copy);
         }
         /**************** END CARD MODAL  ********************/
     }
-
     const handleClickChangeMode = () => {
         setEditMode(!editMode)
     }
-
     const handleSubmitLogin = async (e) => {
         try {
             e.preventDefault();
@@ -255,10 +191,6 @@ const Dashboard = () => {
             setIsLogged(false);
         }
     }
-
-
-
-
     return (
         <>
             {!is_logged ? (
